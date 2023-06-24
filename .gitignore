@@ -1,0 +1,3 @@
+registry/certs/domain.crt
+registry/certs/domain.key
+registry/auth/htpasswd
