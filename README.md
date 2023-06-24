@@ -28,17 +28,7 @@ sudo mkdir -p /etc/docker/certs.d/localhost:5000
 sudo cp ./certs/domain.crt /etc/docker/certs.d/localhost\:5000/ca.crt
 ```
 
-### Create `auth` file
 
-From <https://docs.docker.com/registry/deploying/#native-basic-auth>
-
-```bash
-cd registry
-mkdir auth
-docker run \
-  --entrypoint htpasswd \
-  httpd:2 -Bbn testuser testpassword > auth/htpasswd
-```
 
 ### Run registry
 
@@ -55,11 +45,37 @@ visit <https://localhost:5000/v2/_catalog> and pass `testuser` and `testpassword
 ## Pushing images to registry
 
 ```bash
-docker login -u testuser localhost:5000
-# enter password
 docker pull hello-world
 docker tag hello-world localhost:5000/hello-world
 docker push localhost:5000/hello-world
+docker run --rm localhost:5000/hello-world
 ```
 
 ![Alt text](img/ui.png)
+
+## Optional: basic authentication
+
+From <https://docs.docker.com/registry/deploying/#native-basic-auth>
+
+```bash
+cd registry
+mkdir auth
+docker run \
+  --entrypoint htpasswd \
+  httpd:2 -Bbn testuser testpassword > auth/htpasswd
+```
+
+login with credentials to registry
+
+```bash
+cat testpassword password.txt
+cat password.txt | docker login -u testuser --password-stdin localhost:5000
+```
+
+uncomment `auth` section in `docker-compose.yml` and restart registry
+
+```bash
+docker-compose restart registry
+```
+
+provide credentials to portainer and everywhere else you want to use the registry.
